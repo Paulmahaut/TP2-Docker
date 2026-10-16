@@ -25,3 +25,40 @@ jobs:
       # compile + run unit and integration tests (testcontainers)
       - name: Build and test with Maven
         run: mvn clean verify --file simple-api/pom.xml
+
+  # build and publish the 3 docker images
+  build-and-push-docker-image:
+    # run only when code is compiling and tests are passing
+    needs: test-backend
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # log in to Docker Hub with the secured credentials (GitHub secrets)
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build image and push backend
+        uses: docker/build-push-action@v6
+        with:
+          # relative path to the folder containing the Dockerfile
+          context: ./simple-api
+          # tags must be lower-case
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-simple-api:latest
+          # build on every branch, push only on main
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push database
+        uses: docker/build-push-action@v6
+        with:
+          context: ./database
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-database:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v6
+        with:
+          context: ./http-server
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
