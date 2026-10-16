@@ -26,6 +26,10 @@ jobs:
       - name: Build and test with Maven
         run: mvn clean verify --file simple-api/pom.xml
 
+      # quality gate: send code and test results to SonarCloud for analysis
+      - name: SonarCloud analysis
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=Paulmahaut_TP2-Docker -Dsonar.organization=paulmahaut -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./simple-api/pom.xml
+
   # build and publish the 3 docker images
   build-and-push-docker-image:
     # run only when code is compiling and tests are passing
