@@ -28,7 +28,7 @@ jobs:
 
       # quality gate: send code and test results to SonarCloud for analysis
       - name: SonarCloud analysis
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Paulmahaut_TP2-Docker -Dsonar.organization=paulmahaut -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./simple-api/pom.xml
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Paulmahaut_TP2-Docker -Dsonar.organization=paulmahaut -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} --file ./simple-api/pom.xml
 
   # build and publish the 3 docker images
   build-and-push-docker-image:
